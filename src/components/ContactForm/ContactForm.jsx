@@ -1,5 +1,5 @@
+import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 
 import {
   FormStyled,
@@ -7,8 +7,11 @@ import {
   InputStyled,
   BtnStyled,
 } from './ContactForm.styled';
+import { add } from 'redux/contactsSlice';
 
-const ContactForm = ({ addContacts }) => {
+const ContactForm = () => {
+  const contacts = useSelector(state => state.phoneBook.contacts);
+  const dispatch = useDispatch();
   const [form, setForm] = useState({
     name: '',
     number: '',
@@ -20,8 +23,12 @@ const ContactForm = ({ addContacts }) => {
   };
 
   const handleSubmit = e => {
+    const name = e.target.name.value;
     e.preventDefault();
-    addContacts(form);
+    if (contacts.some(el => el.name.toLowerCase() === name.toLowerCase())) {
+      return alert(`${name} is already in contacts.`);
+    }
+    dispatch(add(form));
     e.target.reset();
   };
 
@@ -52,10 +59,6 @@ const ContactForm = ({ addContacts }) => {
       </LabelStyled>
     </FormStyled>
   );
-};
-
-ContactForm.propTypes = {
-  addContacts: PropTypes.func,
 };
 
 export default ContactForm;

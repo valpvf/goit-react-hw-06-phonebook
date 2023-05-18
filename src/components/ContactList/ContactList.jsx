@@ -1,23 +1,33 @@
-import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
+
 import { BtnStyled } from 'components/ContactForm/ContactForm.styled';
 import { ItemStyled, ListStyled } from './ContactList.styled';
+import { remove } from 'redux/contactsSlice';
 
-const ContactList = ({ contacts, removeContacts }) => {
+const ContactList = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector(state => state.phoneBook.contacts);
+  const filter = useSelector(state => state.phoneBook.filter);
+
+  const showContacts = () => {
+    if (filter === '') return contacts;
+    return contacts.filter(el =>
+      el.name.toLowerCase().includes(filter.toLowerCase())
+    );
+  };
+
+  const renderContacts = showContacts();
+
   return (
     <ListStyled>
-      {contacts.map(el => (
+      {renderContacts.map(el => (
         <ItemStyled key={el.id}>
           {el.name}: {el.number}
-          <BtnStyled onClick={() => removeContacts(el.id)}>Delete</BtnStyled>
+          <BtnStyled onClick={() => dispatch(remove(el.id))}>Delete</BtnStyled>
         </ItemStyled>
       ))}
     </ListStyled>
   );
-};
-
-ContactList.propTypes = {
-  contacts: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)),
-  removeContacts: PropTypes.func,
 };
 
 export default ContactList;
